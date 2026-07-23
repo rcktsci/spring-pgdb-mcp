@@ -31,11 +31,13 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Generate date tag
+        id: date
+        run: echo "tag=$(date +'%Y-%m-%d')" >> "$GITHUB_OUTPUT"
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
         with:
           context: .
           push: true
-          tags: |
-            ghcr.io/rcktsci/spring-pgdb-mcp:latest
-            ghcr.io/rcktsci/spring-pgdb-mcp:${{ github.sha }}
+          tags: ghcr.io/rcktsci/spring-pgdb-mcp:${{ steps.date.outputs.tag }}
