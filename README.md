@@ -1,20 +1,25 @@
 # PostgreSQL MCP Server
 
-MCP-сервер для подключения к PostgreSQL с поддержкой read-only и read-write режимов.
+MCP server for connecting to PostgreSQL with read-only and read-write mode support.
 
-## Предоставляемые инструменты (tools)
+Technical stack:
 
-| Инструмент | Описание                                  |
-|------------|-------------------------------------------|
-| `list`     | Список настроенных подключений            |
-| `query`    | Выполнить SELECT запрос                   |
-| `execute`  | Выполнить INSERT/UPDATE/DELETE/др. запрос |
+- Java 25
+- Spring Boot 4 + Spring AI 2
 
-## Настройка
+## Tools
 
-### Конфигурация
+| Tool      | Description                          |
+|-----------|--------------------------------------|
+| `list`    | List configured database connections |
+| `query`   | Execute a SELECT query               |
+| `execute` | Execute INSERT/UPDATE/DELETE or DDL  |
 
-Создайте файл `config.yml`:
+## Configuration
+
+### Config file
+
+Create a `config.yml` file:
 
 ```yaml
 servers:
@@ -34,25 +39,25 @@ servers:
     readonly: true
 ```
 
-### Параметры
+### Parameters
 
-| Параметр   | Описание                                        |
-|------------|-------------------------------------------------|
-| `name`     | Уникальное имя сервера                          |
-| `host`     | Хост PostgreSQL                                 |
-| `port`     | Порт (по умолчанию 5432)                        |
-| `username` | Имя пользователя                                |
-| `password` | Пароль                                          |
-| `database` | Имя БД                                          |
-| `readonly` | `true` — только SELECT, `false` — полный доступ |
+| Parameter  | Description                                        |
+|------------|----------------------------------------------------|
+| `name`     | Unique server name                                 |
+| `host`     | PostgreSQL host                                    |
+| `port`     | Port (default 5432)                                |
+| `username` | Username                                           |
+| `password` | Password                                           |
+| `database` | Database name                                      |
+| `readonly` | `true` — SELECT only, `false` — full access        |
 
-## Сборка
+## Build
 
 ```bash
 ./mvnw package -DskipTests
 ```
 
-## Запуск
+## Run
 
 ### Docker
 
@@ -65,7 +70,7 @@ docker run -d \
 
 ### Docker Compose
 
-Например, развёртывание на порту 2345:
+Example exposing on port 2345:
 
 ```yaml
 services:
@@ -79,12 +84,12 @@ services:
 
 ## MCP
 
-Сервер использует MCP SSE transport.
+The server uses MCP SSE transport.
 
-- **MCP endpoint:** `:8080/mcp` (внутри контейнера)
-- **MCP endpoint:** `http://<IP>:2345/mcp` (опубликованный порт)
+- **MCP endpoint:** `:8080/mcp` (inside container)
+- **MCP endpoint:** `http://<IP>:2345/mcp` (published port)
 
-## Подключение инструментов во внешних клиентах (Claude Code, OpenCode, т.п.)
+## Connecting tools in external clients (Claude Code, OpenCode, etc.)
 
 ```json
 {
