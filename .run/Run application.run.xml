@@ -1,0 +1,9 @@
+<component name="ProjectRunConfigurationManager">
+    <configuration default="false" name="Run application" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+        <module name="postgresql-mcp-server"/>
+        <option name="SPRING_BOOT_MAIN_CLASS" value="se.rocketscien.mcp.springpgdbmcpserver.SpringPgDbMcpServerApplication"/>
+        <method v="2">
+            <option name="Make" enabled="true"/>
+        </method>
+    </configuration>
+</component>
