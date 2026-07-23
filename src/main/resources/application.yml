@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: spring-pgdb-mcp
+    version: @project.version@
+  main.banner-mode: off
+  config:
+    import:
+      - file:./config.yml
+  ai:
+    mcp:
+      server:
+        name: spring-pgdb-mcp
+        version: @project.version@
+        type: async
+        protocol: streamable
+        streamable-http:
+          mcp-endpoint: /mcp
+        capabilities:
+          tool: true
+          prompt: false
+          completion: false
+          resource: false
