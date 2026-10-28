@@ -65,7 +65,7 @@ servers:
 docker run -d \
   -v ./config.yml:/application/config.yml:ro \
   -p 2345:8080 \
-  ghcr.io/rcktsci/spring-pgdb-mcp:<VERSION>
+  ghcr.io/rcktsci/spring-pgdb-mcp:2026-10-28
 ```
 
 ### Docker Compose
@@ -75,7 +75,7 @@ Example exposing on port 2345:
 ```yaml
 services:
   mcp-server:
-    image: ghcr.io/rcktsci/spring-pgdb-mcp:<VERSION>
+    image: ghcr.io/rcktsci/spring-pgdb-mcp:2026-10-28
     ports:
       - 0.0.0.0:2345:8080/tcp
     volumes:
