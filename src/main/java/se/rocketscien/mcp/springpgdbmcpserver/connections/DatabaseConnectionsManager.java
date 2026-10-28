@@ -42,6 +42,12 @@ class DatabaseConnectionsManager {
         hikariConfig.setIdleTimeout(60_000L);
         hikariConfig.setMaxLifetime(600_000L);
 
+        // pgjdbc defers setReadOnly inside a transaction, so the session default is pinned too
+        if (config.readonly()) {
+            hikariConfig.setReadOnly(true);
+            hikariConfig.setConnectionInitSql("SET default_transaction_read_only = on");
+        }
+
         return new HikariDataSource(hikariConfig);
     }
 }
