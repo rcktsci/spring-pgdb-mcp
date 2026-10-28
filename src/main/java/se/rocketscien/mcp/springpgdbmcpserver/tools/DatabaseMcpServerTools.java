@@ -5,6 +5,8 @@ import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.stereotype.Service;
 
+import se.rocketscien.mcp.springpgdbmcpserver.config.AuthException;
+import se.rocketscien.mcp.springpgdbmcpserver.connections.AuthService;
 import se.rocketscien.mcp.springpgdbmcpserver.connections.DatabaseService;
 
 import java.sql.SQLException;
@@ -16,13 +18,17 @@ import java.util.Map;
 public class DatabaseMcpServerTools {
 
     private final DatabaseService databaseService;
+    private final AuthService authService;
 
     @Tool(
             name = "list",
             description = "List all configured database servers"
     )
     public List<Map<String, Object>> listServers() {
-        return databaseService.listServers();
+        var allowed = authService.allowedServers();
+        return databaseService.listServers().stream()
+                .filter(server -> allowed.contains(server.get("name")))
+                .toList();
     }
 
     @Tool(
@@ -34,8 +40,11 @@ public class DatabaseMcpServerTools {
             @ToolParam(description = "SQL SELECT query") String sql
     ) {
         try {
+            authService.requireServer(server);
             return databaseService.query(server, sql);
         } catch (SQLException e) {
+            return List.of(Map.of("error", e.getMessage()));
+        } catch (AuthException e) {
             return List.of(Map.of("error", e.getMessage()));
         }
     }
@@ -49,8 +58,11 @@ public class DatabaseMcpServerTools {
             @ToolParam(description = "SQL INSERT/UPDATE/DELETE query") String sql
     ) {
         try {
+            authService.requireServer(server);
             return databaseService.execute(server, sql);
         } catch (SQLException e) {
+            return Map.of("error", e.getMessage());
+        } catch (AuthException e) {
             return Map.of("error", e.getMessage());
         }
     }
