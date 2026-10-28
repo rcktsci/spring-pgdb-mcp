@@ -11,7 +11,7 @@ spring:
       server:
         name: spring-pgdb-mcp
         version: @project.version@
-        type: async
+        type: sync
         protocol: streamable
         streamable-http:
           mcp-endpoint: /mcp
