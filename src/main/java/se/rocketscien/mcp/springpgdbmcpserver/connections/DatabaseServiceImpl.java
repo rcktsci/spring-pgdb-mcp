@@ -18,6 +18,7 @@ class DatabaseServiceImpl implements DatabaseService {
 
     private final DatabaseConnectionsManager databaseConnectionsManager;
     private final ServerListConfig serverListConfig;
+    private final AuthService authService;
 
     @Override
     public List<Map<String, Object>> listServers() {
@@ -54,6 +55,9 @@ class DatabaseServiceImpl implements DatabaseService {
         if (server.readonly()) {
             throw new SQLException("Server '" + serverName + "' is configured as readonly");
         }
+        if (authService.isReadonly(serverName)) {
+            throw new SQLException("Server '" + serverName + "' is readonly for this token");
+        }
 
         if (isSelect(sql)) {
             var result = executeQuery(server, sql);
@@ -67,10 +71,15 @@ class DatabaseServiceImpl implements DatabaseService {
         return executeUpdate(server, sql);
     }
 
+    /** Server-level readonly from the connection config, or token-level from the caller's auth entry. */
+    private boolean isReadonly(ServerConfig server) {
+        return server.readonly() || authService.isReadonly(server.name());
+    }
+
     private List<Map<String, Object>> executeQuery(ServerConfig server, String sql) throws SQLException {
         List<Map<String, Object>> results = new ArrayList<>();
 
-        try (var connection = databaseConnectionsManager.getDataSource(server).getConnection();
+        try (var connection = databaseConnectionsManager.getDataSource(server, isReadonly(server)).getConnection();
              var statement = connection.createStatement();
              var resultSet = statement.executeQuery(sql)) {
 
@@ -92,7 +101,7 @@ class DatabaseServiceImpl implements DatabaseService {
     private Map<String, Object> executeUpdate(ServerConfig server, String sql) throws SQLException {
         Map<String, Object> result = new LinkedHashMap<>();
 
-        try (var conn = databaseConnectionsManager.getDataSource(server).getConnection();
+        try (var conn = databaseConnectionsManager.getDataSource(server, isReadonly(server)).getConnection();
              var stmt = conn.createStatement()) {
 
             var affectedRows = stmt.executeUpdate(sql);

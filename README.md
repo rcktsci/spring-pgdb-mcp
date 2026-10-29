@@ -24,10 +24,11 @@ Create a `config.yml` file:
 ```yaml
 auth-tokens:
   "0d3aa0f9-5b1e-4a1f-9d0e-2f8c1b7a6c55":   # token string (e.g. UUID)
-    - "staging"                              # allowed server names
+    - server: staging                        # allowed server names
   "f81d4fae-7dec-11d0-a765-00a0c91e6bf6":
-    - "staging"
-    - "production"
+    - server: staging
+    - server: production
+      readonly: true                         # optional, default false
 
 servers:
   - name: "staging"
@@ -62,10 +63,11 @@ servers:
 
 Every MCP request must carry an `Authorization: Bearer <token>` header. Requests without a valid token are rejected with `401 Unauthorized`.
 
-The `auth-tokens` section maps a token to the names of `servers` entries the token may access:
+The `auth-tokens` section maps a token to the list of servers the token may access:
 
 - `list` shows only the servers allowed for the token;
-- `query` and `execute` reject server names outside the token's list.
+- `query` and `execute` reject server names outside the token's list;
+- `readonly: true` on an entry makes that server read-only for the token even if the connection itself is read-write: `execute` is rejected and `query` runs on a read-only session, so data-modifying CTEs and multi-statement batches fail on the database level.
 
 If `auth-tokens` is missing or empty, no client can connect.
 

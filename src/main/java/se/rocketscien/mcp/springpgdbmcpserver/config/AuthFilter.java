@@ -1,7 +1,8 @@
 package se.rocketscien.mcp.springpgdbmcpserver.config;
 
 import java.io.IOException;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -66,8 +67,16 @@ public class AuthFilter extends OncePerRequestFilter {
             return null;
         }
 
-        var servers = authTokens.get(token);
-        return servers == null ? null : new AuthService.AuthContext(token, Set.copyOf(servers));
+        var entries = authTokens.get(token);
+        if (entries == null) {
+            return null;
+        }
+
+        Map<String, Boolean> servers = new HashMap<>();
+        for (var entry : entries) {
+            servers.put(entry.server(), entry.readonly());
+        }
+        return new AuthService.AuthContext(token, Map.copyOf(servers));
     }
 
     @Override

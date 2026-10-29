@@ -13,9 +13,11 @@ public class ServerListConfig {
     List<ServerConfig> servers;
 
     /**
-     * Bearer token -> names of servers the token may access.
+     * Bearer token -> servers the token may access, with a per-token readonly flag.
      */
-    Map<String, List<String>> authTokens;
+    Map<String, List<ServerAccess>> authTokens;
+
+    public record ServerAccess(String server, boolean readonly) {}
 
     public record ServerConfig(
             String name,

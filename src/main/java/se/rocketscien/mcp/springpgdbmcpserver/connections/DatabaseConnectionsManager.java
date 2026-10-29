@@ -21,15 +21,19 @@ class DatabaseConnectionsManager {
     private final Map<String, HikariDataSource> dataSources = new ConcurrentHashMap<>();
 
     @Locked
-    public DataSource getDataSource(ServerConfig config) {
+    public DataSource getDataSource(ServerConfig config, boolean readonly) {
         return dataSources.computeIfAbsent(
-                config.name(),
-                name -> createDataSource(config)
+                poolKey(config.name(), readonly),
+                name -> createDataSource(config, readonly)
         );
     }
 
+    private static String poolKey(String name, boolean readonly) {
+        return readonly ? name + ":readonly" : name;
+    }
+
     @NonNull
-    private static HikariDataSource createDataSource(ServerConfig config) {
+    private static HikariDataSource createDataSource(ServerConfig config, boolean readonly) {
         var hikariConfig = new HikariConfig();
 
         hikariConfig.setJdbcUrl(config.getJdbcUrl());
@@ -43,7 +47,7 @@ class DatabaseConnectionsManager {
         hikariConfig.setMaxLifetime(600_000L);
 
         // pgjdbc defers setReadOnly inside a transaction, so the session default is pinned too
-        if (config.readonly()) {
+        if (readonly) {
             hikariConfig.setReadOnly(true);
             hikariConfig.setConnectionInitSql("SET default_transaction_read_only = on");
         }
