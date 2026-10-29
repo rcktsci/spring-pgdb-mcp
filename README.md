@@ -85,7 +85,7 @@ If `auth-tokens` is missing or empty, no client can connect.
 docker run -d \
   -v ./config.yml:/application/config.yml:ro \
   -p 2345:8080 \
-  ghcr.io/rcktsci/spring-pgdb-mcp:2026-10-28
+  ghcr.io/rcktsci/spring-pgdb-mcp:2026-10-29
 ```
 
 ### Docker Compose
@@ -95,7 +95,7 @@ Example exposing on port 2345:
 ```yaml
 services:
   mcp-server:
-    image: ghcr.io/rcktsci/spring-pgdb-mcp:2026-10-28
+    image: ghcr.io/rcktsci/spring-pgdb-mcp:2026-10-29
     ports:
       - 0.0.0.0:2345:8080/tcp
     volumes:
