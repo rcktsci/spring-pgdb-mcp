@@ -19,6 +19,7 @@ public class BaseApplicationTest {
     protected static final String ALL_TOKEN = "550e8400-e29b-41d4-a716-446655440000";
     protected static final String RO_ONLY_TOKEN = "550e8400-e29b-41d4-a716-446655440001";
     protected static final String RO_ON_RW_TOKEN = "550e8400-e29b-41d4-a716-446655440002";
+    protected static final String RW_ON_RO_TOKEN = "550e8400-e29b-41d4-a716-446655440003";
 
     protected static final String RW_SERVER = "rw";
     protected static final String RO_SERVER = "ro";
@@ -52,6 +53,9 @@ public class BaseApplicationTest {
                   "%s":
                     - server: "%s"
                       readonly: true
+                  "%s":
+                    - server: "%s"
+                      readonly: false
                 servers:
                   - name: "%s"
                     host: "%s"
@@ -71,6 +75,7 @@ public class BaseApplicationTest {
                 ALL_TOKEN, RW_SERVER, RO_SERVER,
                 RO_ONLY_TOKEN, RO_SERVER,
                 RO_ON_RW_TOKEN, RW_SERVER,
+                RW_ON_RO_TOKEN, RO_SERVER,
                 RW_SERVER, DATABASE.getHost(), DATABASE.getMappedPort(5432),
                 DATABASE.getUsername(), DATABASE.getPassword(), DATABASE.getDatabaseName(),
                 RO_SERVER, DATABASE.getHost(), DATABASE.getMappedPort(5432),

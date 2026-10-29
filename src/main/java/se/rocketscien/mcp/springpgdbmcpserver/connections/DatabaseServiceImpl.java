@@ -52,11 +52,8 @@ class DatabaseServiceImpl implements DatabaseService {
     public Map<String, Object> execute(String serverName, String sql) throws SQLException {
         var server = findServer(serverName);
 
-        if (server.readonly()) {
-            throw new SQLException("Server '" + serverName + "' is configured as readonly");
-        }
-        if (authService.isReadonly(serverName)) {
-            throw new SQLException("Server '" + serverName + "' is readonly for this token");
+        if (isReadonly(server)) {
+            throw new SQLException("Server '" + serverName + "' is readonly");
         }
 
         if (isSelect(sql)) {
@@ -71,9 +68,10 @@ class DatabaseServiceImpl implements DatabaseService {
         return executeUpdate(server, sql);
     }
 
-    /** Server-level readonly from the connection config, or token-level from the caller's auth entry. */
+    /** The token entry's readonly overrides; when the entry does not specify one, the server's config applies. */
     private boolean isReadonly(ServerConfig server) {
-        return server.readonly() || authService.isReadonly(server.name());
+        var tokenValue = authService.tokenReadonly(server.name());
+        return tokenValue != null ? tokenValue : server.readonly();
     }
 
     private List<Map<String, Object>> executeQuery(ServerConfig server, String sql) throws SQLException {

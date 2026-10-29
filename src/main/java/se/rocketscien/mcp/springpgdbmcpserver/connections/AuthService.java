@@ -10,7 +10,7 @@ import java.util.Set;
 @Service
 public class AuthService {
 
-    /** Allowed servers by name, true when the token is limited to reads on that server. */
+    /** Effective readonly per allowed server: the token entry's override, or the server's own config. */
     public record AuthContext(String token, Map<String, Boolean> servers) {}
 
     public static final ScopedValue<AuthContext> CURRENT = ScopedValue.newInstance();
@@ -25,7 +25,8 @@ public class AuthService {
         }
     }
 
-    public boolean isReadonly(String name) {
-        return CURRENT.isBound() && Boolean.TRUE.equals(CURRENT.get().servers().get(name));
+    /** Resolved readonly for the server, or null when unauthenticated or the server is not in the token's list. */
+    public Boolean tokenReadonly(String name) {
+        return CURRENT.isBound() ? CURRENT.get().servers().get(name) : null;
     }
 }

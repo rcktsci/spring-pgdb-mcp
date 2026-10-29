@@ -74,9 +74,21 @@ public class AuthFilter extends OncePerRequestFilter {
 
         Map<String, Boolean> servers = new HashMap<>();
         for (var entry : entries) {
-            servers.put(entry.server(), entry.readonly());
+            servers.put(entry.server(), effectiveReadonly(entry));
         }
         return new AuthService.AuthContext(token, Map.copyOf(servers));
+    }
+
+    /** The entry's readonly overrides the server's own config; when absent it is inherited from it. */
+    private boolean effectiveReadonly(ServerListConfig.ServerAccess entry) {
+        if (entry.readonly() != null) {
+            return entry.readonly();
+        }
+        return serverListConfig.getServers().stream()
+                .filter(s -> s.name().equals(entry.server()))
+                .findFirst()
+                .map(ServerListConfig.ServerConfig::readonly)
+                .orElse(false);
     }
 
     @Override

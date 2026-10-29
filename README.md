@@ -28,7 +28,7 @@ auth-tokens:
   "f81d4fae-7dec-11d0-a765-00a0c91e6bf6":
     - server: staging
     - server: production
-      readonly: true                         # optional, default false
+      readonly: true                         # optional, overrides the server's readonly
 
 servers:
   - name: "staging"
@@ -67,7 +67,7 @@ The `auth-tokens` section maps a token to the list of servers the token may acce
 
 - `list` shows only the servers allowed for the token;
 - `query` and `execute` reject server names outside the token's list;
-- `readonly: true` on an entry makes that server read-only for the token even if the connection itself is read-write: `execute` is rejected and `query` runs on a read-only session, so data-modifying CTEs and multi-statement batches fail on the database level.
+- `readonly` on an entry overrides the server's own `readonly` for this token; when omitted, the server's `readonly` applies. `readonly: true` makes the server read-only for the token even if the connection is read-write (`execute` rejected, `query` on a read-only session), `readonly: false` grants writes even if the server is configured readonly. In both directions the restriction is enforced on the database session level, so data-modifying CTEs and multi-statement batches obey it too.
 
 If `auth-tokens` is missing or empty, no client can connect.
 
